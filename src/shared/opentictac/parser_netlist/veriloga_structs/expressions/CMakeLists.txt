@@ -1,0 +1,33 @@
+target_sources(
+        opentictac
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_AnalogBuiltInMathFunction.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_AnalogConcatenation.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_AnalogConditionalExpression.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_AnalogFilterOperationFunction.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_AnalogFunctionCall.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_AnalogPortReference.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_AnalogSmallSignalFunction.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_AnalysisFunction.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_BinaryOperator.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_BranchProbeFunction.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_EnvironmentParameterFunction.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_ExpressionBasis.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_FunctionArgument.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_FunctionCall.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_HierarchSysParamFunctions.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_IndexedIdentifier.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_Number.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_ParameterReference.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_RandomFunction.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_String.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_StringFunction.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_SystemFunction.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_UnaryOperator.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_VariableReference.cpp
+)
+target_include_directories(
+        opentictac
+        PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)

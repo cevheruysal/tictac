@@ -1,0 +1,22 @@
+target_sources(
+        opentictac
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/Device.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/nonlin/D_SimpleMOSFET.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/nonlin/SimpleBJT.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/nonlin/SimpleDiode.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/linear/Capacitor.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/linear/Inductor.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/linear/Resistor.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/sources/IndependenCurrentSource.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/sources/IndependentVoltageSource.cpp
+)
+
+target_include_directories(
+        opentictac
+        PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/linear
+        ${CMAKE_CURRENT_SOURCE_DIR}/nonlin
+        ${CMAKE_CURRENT_SOURCE_DIR}/sources
+)

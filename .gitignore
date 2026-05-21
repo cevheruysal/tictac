@@ -1,0 +1,11 @@
+# GIT shall not track:
+# build directories 
+/build*
+/bin*
+/install*
+# netbean project directory (assuming it starts with nb_ which is a user choice)
+/nb*
+# output directory
+/output*
+#IDEs
+.idea/*

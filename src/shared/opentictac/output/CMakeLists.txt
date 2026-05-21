@@ -1,0 +1,13 @@
+target_sources(
+        opentictac
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/OUT_GnuplotPlotter.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/OUT_MatlabPlotter.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/OUT_MessageHandle.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/OUT_WaveFormPlotter.cpp
+)
+target_include_directories(
+        opentictac
+        PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)

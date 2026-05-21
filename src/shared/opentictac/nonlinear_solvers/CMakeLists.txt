@@ -1,0 +1,11 @@
+target_sources(
+        opentictac
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/NS_Function.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/NS_NonlinearSolver.cpp
+)
+target_include_directories(
+        opentictac
+        PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)

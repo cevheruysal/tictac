@@ -1,0 +1,17 @@
+target_sources(
+        opentictac
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_AKDependency.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_AKDependency.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_AKModuleSpecInfo.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_AKModuleSpecInfo.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_ErrorInfo.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_ErrorInfo.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_GenerateInfo.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_GenerateInfo.hpp
+)
+target_include_directories(
+        opentictac
+        PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)

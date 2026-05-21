@@ -1,0 +1,12 @@
+target_sources(
+        opentictac
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/AN_DTController.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/AN_SimulationControllers.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/AN_Tran_TimeStepController.cpp
+)
+target_include_directories(
+        opentictac
+        PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)

@@ -1,0 +1,14 @@
+target_sources(
+        opentictac
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/IP_DeviceMatchinRule.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IP_ExpansionStack.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IP_InstanceableDeviceList.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IP_NetlistExpander.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IP_SimpleDevsList.cpp
+)
+target_include_directories(
+        opentictac
+        PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)

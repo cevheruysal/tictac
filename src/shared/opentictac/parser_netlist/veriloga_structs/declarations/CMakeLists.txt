@@ -1,0 +1,24 @@
+target_sources(
+        opentictac
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_AnalogFunctionDeclaration.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_AttributeInstance.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_BranchDeclaration.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_DisciplineDeclaration.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_ModuleDeclaration.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_ModuleInstantiation.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_NatureAndDisciplineCollection.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_NatureDeclaration.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_Parameter.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_ParameterDeclaration.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_Port.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_Range.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_ValueRange.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_VariableDeclaration.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_VerilogModuleCollection.cpp
+)
+target_include_directories(
+        opentictac
+        PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)

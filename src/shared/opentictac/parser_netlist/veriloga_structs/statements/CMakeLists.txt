@@ -1,0 +1,22 @@
+target_sources(
+        opentictac
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_AnalogCaseStatement.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_AnalogConditionalStatement.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_AnalogDispOrSysFunc.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_AnalogEventControlStatement.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_AnalogEventFunction.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_AnalogInitialBlock.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_AnalogLoopGenerateStatement.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_AnalogLoopStatement.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_AnalogSeqBlock.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_AnalogStatement.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_AnalogVariableAssignment.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_ContributionStatement.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CS_IndirectContributionStatement.cpp
+)
+target_include_directories(
+        opentictac
+        PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)

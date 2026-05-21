@@ -1,0 +1,16 @@
+target_sources(
+        opentictac
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/IP_AnaysisCard.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IP_Assertion.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IP_ControlBase.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IP_GlobalSettings.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IP_Measurement.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IP_Option.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IP_Output.cpp
+)
+target_include_directories(
+        opentictac
+        PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)

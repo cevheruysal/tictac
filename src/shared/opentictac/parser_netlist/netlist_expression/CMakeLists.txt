@@ -1,0 +1,11 @@
+target_sources(
+        opentictac
+        PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/IP_ExprConstEvaluator.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IP_ExpressionParser.cpp
+)
+target_include_directories(
+        opentictac
+        PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
