@@ -124,10 +124,50 @@ private:
     MYINT verb = 5, iuflow = 0;
     MYREAL pmin = 1E-15;
 
- 
- /* === HERE STARTS THE CODE OF ASSIGNMENT: 1 ==== */ 
- 
- /* === HERE ENDS THE CODE OF ASSIGNMENT: 1 ==== */ 
+    MYINT NR = CRSmatrix_->getNrRows();
+    for (MYINT i = 0; i < NR; i++) {
+      MYINT startRowI = rowPtr[i];
+      MYINT endRowI = rowPtr[i+1];
+      for (MYINT k = startRowI; k < endRowI; ++k) {
+        tabl[colInd[k]] = k;
+      }
+
+      MYINT diagIdxI = iu_index[i] - 1;
+      MYINT l = diagIdxI - startRowI;
+      for (MYINT j = 0; j < l; ++j) {
+        MYINT p = startRowI + j;
+        MYINT e = colInd[p];
+
+        DATAT d = A[iu_index[e] - 1];
+        if (my_fabs(d) < pmin) {
+          d = (my_getReal(d) >= 0.0) ? my_convert(pmin, d) : my_convert(-pmin, d);
+          iuflow++;
+        }
+
+        DATAT f = A[p] / d;
+        A[p] = f;
+
+        MYINT startU_e = iu_index[e];
+        MYINT endU_e = rowPtr[e+1];
+        for (MYINT k = startU_e; k < endU_e; ++k) {
+          MYINT col = colInd[k];
+          MYINT pos = tabl[col];
+          if (pos >= 0) {
+            A[pos] -= f * A[k];
+          }
+        }
+      }
+
+      DATAT diagVal = A[diagIdxI];
+      if (my_fabs(diagVal) < pmin) {
+        A[diagIdxI] = (my_getReal(diagVal) >= 0.0) ? my_convert(pmin, diagVal) : my_convert(-pmin, diagVal);
+        iuflow++;
+      }
+
+      for (MYINT k = startRowI; k < endRowI; ++k) {
+        tabl[colInd[k]] = -1;
+      }
+    }
 
     // print underflow
     if (iuflow > 0)
@@ -152,10 +192,26 @@ private:
 
     SIM_PRINT_L0(verb,"doFBSubstitution ...");
 
- 
- /* === HERE STARTS THE CODE OF ASSIGNMENT: 1 ==== */ 
- 
- /* === HERE ENDS THE CODE OF ASSIGNMENT: 1 ==== */ 
+    X[0] = rhs[0];
+    for (i = 1; i < n; i++) {
+      DATAT sum = my_convert(0.0, X[0]);
+      jstart = ilstrt[i];
+      jstop = iustrt[i] - 1;
+      for (j = jstart; j < jstop; j++) {
+        sum += A[j] * X[colinf[j]];
+      }
+      X[i] = rhs[i] - sum;
+    }
+
+    for (i = n - 1; i >= 0; i--) {
+      DATAT sum = my_convert(0.0, X[0]);
+      jstart = iustrt[i];
+      jstop = ilstrt[i+1];
+      for (j = jstart; j < jstop; j++) {
+        sum += A[j] * X[colinf[j]];
+      }
+      X[i] = (X[i] - sum) / A[iustrt[i] - 1];
+    }
 
   }
 
