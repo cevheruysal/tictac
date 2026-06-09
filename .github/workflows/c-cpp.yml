@@ -1,0 +1,47 @@
+name: C++ CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache APT packages
+        uses: actions/cache@v4
+        with:
+          path: /var/cache/apt/archives
+          key: ${{ runner.os }}-apt-${{ hashFiles('.github/workflows/ci.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-apt-
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake g++ libboost-all-dev
+
+      - name: Cache CMake build
+        uses: actions/cache@v4
+        with:
+          path: build
+          key: ${{ runner.os }}-build-${{ hashFiles('CMakeLists.txt', 'src/**') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+
+      - name: Build
+        run: |
+          cmake -B build -S . && cmake --build build
+
+      - name: Run tests
+        run: |
+          for file in netlists/*; do
+            echo "Testing $file"
+            build/bin/tictac_simulator "$file"
+            for i in {1..64}; do printf "-"; done; echo ""
+          done
