@@ -1,0 +1,12 @@
+* Circuit 5
+V1 1 0 DC=1
+R1 1 11 R=2k
+R2 11 21 R=1k
+R3 11 12 R=1k
+I1 12 21 DC=1
+R4 21 22 R=1k
+R5 12 22 R=1k
+R6 22 2 R=2k
+V2 2 0 DC=0
+.op
+.end

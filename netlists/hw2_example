@@ -1,0 +1,10 @@
+VSIN 0 1 SIN( 0 5 1 0 )
+R1 1 0 500
+
+.TRAN 0.01 6
+.option delmin=0.01
+.option delmax=0.01
+
+.plot tran V(1) I(VSIN)
+.option MATLAB
+.save hw2_example

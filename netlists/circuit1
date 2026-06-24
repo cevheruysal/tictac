@@ -1,5 +1,0 @@
-* Circuit 1
-V1 1 0 DC=5
-R1 1 0 R=5k
-.op
-.end

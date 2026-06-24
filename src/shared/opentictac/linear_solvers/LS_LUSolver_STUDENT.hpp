@@ -124,50 +124,55 @@ private:
     MYINT verb = 5, iuflow = 0;
     MYREAL pmin = 1E-15;
 
-    MYINT NR = CRSmatrix_->getNrRows();
-    for (MYINT i = 0; i < NR; i++) {
-      MYINT startRowI = rowPtr[i];
-      MYINT endRowI = rowPtr[i+1];
-      for (MYINT k = startRowI; k < endRowI; ++k) {
-        tabl[colInd[k]] = k;
-      }
+    /*=========== START STUDENT PROJECT A1 ===================== */
+    const MYINT *colTabl;
+    MYINT colIndTmp, actualRow, nrLColumns, colIndI, i, j;
+    for (actualRow = 0; actualRow < CRSmatrix_->getNrRows(); actualRow++)
+      {
+        bool needsElimin = ((iu_index[actualRow] - rowPtr[actualRow]) > 1 );
+        if (needsElimin)
+          {
+            /* ======================== FACTORIZATION ========================= */
+            /* set up the lookup table */
+            for (i = rowPtr[actualRow]; i < rowPtr[actualRow+1]; i++)
+              tabl[ colInd[i] ] = i;
 
-      MYINT diagIdxI = iu_index[i] - 1;
-      MYINT l = diagIdxI - startRowI;
-      for (MYINT j = 0; j < l; ++j) {
-        MYINT p = startRowI + j;
-        MYINT e = colInd[p];
+            /* number of elements in L part that we can eliminate actually */
+            nrLColumns = iu_index[actualRow] - rowPtr[actualRow] - 1;
+            colIndI = rowPtr[actualRow];
+            colTabl = &(colInd[0]);
+            /* for each row impacting this row */
+            for (i = 0 ; i < nrLColumns ; i++)
+              {
+                colIndTmp = colInd[colIndI+i];
 
-        DATAT d = A[iu_index[e] - 1];
-        if (my_fabs(d) < pmin) {
-          d = (my_getReal(d) >= 0.0) ? my_convert(pmin, d) : my_convert(-pmin, d);
-          iuflow++;
-        }
+                /* make elimination only if the element is nonzero */
+                if (my_fabs(A[ tabl[colIndTmp] ]))
+                  {
+                    MYINT startI = iu_index[colIndTmp];
+                    MYINT endI = rowPtr[colIndTmp+1];
 
-        DATAT f = A[p] / d;
-        A[p] = f;
+                    A[ tabl[colIndTmp] ] =
+                        A[ tabl[colIndTmp] ] * A [ iu_index[colIndTmp]-1 ];
+                    h = A[ tabl[colIndTmp] ];
+                    for ( j = startI ; j < endI ; j++)
+                      A[ tabl[ colTabl[j] ] ] = A[ tabl[ colTabl[j] ] ] - h*A[j];
+                  }
+               }
+           } // end if elimination is needed
 
-        MYINT startU_e = iu_index[e];
-        MYINT endU_e = rowPtr[e+1];
-        for (MYINT k = startU_e; k < endU_e; ++k) {
-          MYINT col = colInd[k];
-          MYINT pos = tabl[col];
-          if (pos >= 0) {
-            A[pos] -= f * A[k];
+        /* compute the 1/a_jj only when we are done with this row */
+        j = iu_index[actualRow]-1;
+        if (my_fabs( A[ j ] ) < pmin)
+          {
+            A[j] = my_convert( (my_getReal(A[j]) < 0.0) ? ((-1.0 / pmin)) : ((+1.0 / pmin)) , A[0] );
+            iuflow++;
           }
-        }
+        else
+          A[j] = my_invert(A[j]);
       }
 
-      DATAT diagVal = A[diagIdxI];
-      if (my_fabs(diagVal) < pmin) {
-        A[diagIdxI] = (my_getReal(diagVal) >= 0.0) ? my_convert(pmin, diagVal) : my_convert(-pmin, diagVal);
-        iuflow++;
-      }
-
-      for (MYINT k = startRowI; k < endRowI; ++k) {
-        tabl[colInd[k]] = -1;
-      }
-    }
+    /*============== END STUDENT PROJECT A1 ===============*/
 
     // print underflow
     if (iuflow > 0)
@@ -192,26 +197,37 @@ private:
 
     SIM_PRINT_L0(verb,"doFBSubstitution ...");
 
+    /*=========== START STUDENT PROJECT A1 ===================== */
+    // forward substitution
     X[0] = rhs[0];
-    for (i = 1; i < n; i++) {
-      DATAT sum = my_convert(0.0, X[0]);
-      jstart = ilstrt[i];
-      jstop = iustrt[i] - 1;
-      for (j = jstart; j < jstop; j++) {
-        sum += A[j] * X[colinf[j]];
+    for (i = 1; i < n; i++)
+      {
+        jstart = ilstrt[i];
+        jstop = iustrt[i]-1;
+        tmpr = my_convert(0.0,A[0]);
+        for (j = jstart; j < jstop; j++)
+          {
+            tmpr = tmpr + A[j] * X[colinf[j]];
+          }
+        X[i] = rhs[i] - tmpr;
+        //SIM_PRINT_L5(verb,"FS i=" << i << " jstart="<< jstart << " jstop=" << jstop << " x[i]" << X[i]);
       }
-      X[i] = rhs[i] - sum;
-    }
-
-    for (i = n - 1; i >= 0; i--) {
-      DATAT sum = my_convert(0.0, X[0]);
-      jstart = iustrt[i];
-      jstop = ilstrt[i+1];
-      for (j = jstart; j < jstop; j++) {
-        sum += A[j] * X[colinf[j]];
+    // backward substitution
+    for (i = n-1; i >= 0 ; i--)
+      {
+        jstart = iustrt[i];
+        jstop = ilstrt[i+1];
+        tmpr = my_convert(0.0,A[0]);
+        for (j = jstart; j < jstop; j++)
+          {
+            tmpr = tmpr + A[j]* X[colinf[j]];
+          }
+        X[i] = X[i] - tmpr;
+        //Diagonal entry was already inverted
+        X[i] = X[i] * A[jstart-1];
+        //SIM_PRINT_L5(verb,"BS i=" << i << " jstart="<< jstart << " jstop=" << jstop << " x[i]" << X[i]);
       }
-      X[i] = (X[i] - sum) / A[iustrt[i] - 1];
-    }
+    /*=========== END STUDENT PROJECT A1 ===================== */
 
   }
 

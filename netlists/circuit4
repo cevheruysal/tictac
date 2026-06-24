@@ -1,8 +1,0 @@
-* Circuit 4
-V1 1 0 DC=5
-R1 1 2 R=1k
-R2 2 3 R=2k
-R3 3 4 R=3k
-V2 4 0 DC=1
-.op
-.end

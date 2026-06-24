@@ -30,7 +30,7 @@ void Inductor::getAnalysisStamp(
     const AN_Analysis *analysis) const
 {
 
-
+ 
  /* === HERE STARTS THE CODE OF ASSIGNMENT: 2 ==== */ 
 
  
@@ -46,7 +46,7 @@ void Inductor::getAnalysisStampRHS(
      const AN_Analysis *analysis) const
 {
 
-
+ 
  /* === HERE STARTS THE CODE OF ASSIGNMENT: 2 ==== */ 
 
  
@@ -69,6 +69,7 @@ void Inductor::evalDevice(
     )
 {
 
+ 
  /* === HERE STARTS THE CODE OF ASSIGNMENT: 2 ==== */ 
  
  /* === HERE ENDS THE CODE OF ASSIGNMENT: 2 ==== */ 

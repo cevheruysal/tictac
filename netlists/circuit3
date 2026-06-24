@@ -1,7 +1,0 @@
-* Circuit 3
-V1 1 0 DC=1
-R1 1 0 R=1k
-R2 1 2 R=1k
-R3 2 0 R=1k
-.op
-.end
