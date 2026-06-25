@@ -125,8 +125,56 @@ void AN_Tran_TimeStepController::computeLTEandnewTimeStep(
 
  
  /* === HERE STARTS THE CODE OF ASSIGNMENT: 2 ==== */ 
+  if (nrDDT > 0 && dtContrl_->getIntegScheme() == IE_SCHEME) {
+    MYREAL max_f_LTE = 0.0;
+    
+    for (i = 0; i < nrDDT; ++i) {
+      MYREAL ddt_i = dtContrl_->getDDT(i);
+      MYREAL E_LTE_i = dtContrl_->getLTE_DDTX(i);
+      
+      MYREAL t_i = timeStepControlRec_->chargeTRTOL_ * 
+             (timeStepControlRec_->chargeAbsTol_ + timeStepControlRec_->chargeRelTol_ * SIMABS(ddt_i));
+      
+      MYREAL q_i = dtContrl_->getDDTX(i);
+      MYREAL th_i = timeStepControlRec_->chargeHeuristicRelTol_ * 
+              SIMMAX(SIMABS(q_i), timeStepControlRec_->chargeHeuristicAbsTol_) / oldDT;
+              
+      MYREAL t_new_i = SIMMAX(t_i, th_i);
+      
+      MYREAL f_LTE_i = E_LTE_i / t_new_i;
+      if (f_LTE_i > max_f_LTE) {
+        max_f_LTE = f_LTE_i;
+      }
+    }
+    
+    maxLTEFact = max_f_LTE;
+    
+    if (max_f_LTE > timeStepControlRec_->maxChargeLTEFactor_) {
+			if (oldDT > timeStepControlRec_->minimalDeltaT_ * 1.0001) {
+				rejectStep = true;
+			}
+    }
+    
+    if (max_f_LTE > 1e-15) {
+			deltaT = 0.5 * (1.0 / sqrt(max_f_LTE)) * oldDT;
+    } else {
+			deltaT = oldDT * maxDTIncrease_;
+    }
+    
+    if (deltaT > oldDT * maxDTIncrease_) {
+      deltaT = oldDT * maxDTIncrease_;
+    }
+    
+    if (deltaT < timeStepControlRec_->minimalDeltaT_) {
+      deltaT = timeStepControlRec_->minimalDeltaT_;
+    }
+    if (deltaT > timeStepControlRec_->maximalDeltaT_) {
+      deltaT = timeStepControlRec_->maximalDeltaT_;
+    }
 
- 
+  } else {
+    deltaT = timeStepControlRec_->maximalDeltaT_;
+  }
  /* === HERE ENDS THE CODE OF ASSIGNMENT: 2 ==== */ 
 
 

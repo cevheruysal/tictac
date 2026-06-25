@@ -276,11 +276,14 @@ public:
 
    /** returns the LTE of the x^dot, where x is the argument of the DDT operators
     * x is the charge and x^dot are the dynamic currents*/
-   MYREAL getLTE_DDTX(MYINT ddtIndex) const {
- /* === HERE STARTS THE CODE OF ASSIGNMENT: 2 ==== */ 
- 
- /* === HERE ENDS THE CODE OF ASSIGNMENT: 2 ==== */ 
-   }
+  MYREAL getLTE_DDTX(MYINT ddtIndex) const {
+  /* === HERE STARTS THE CODE OF ASSIGNMENT: 2 ==== */ 
+    if (integrationScheme_ == IE_SCHEME) {
+      return getDeltaT() * SIMABS(getDD2(ddtIndex, 0));
+    }
+    return 0.0;
+  /* === HERE ENDS THE CODE OF ASSIGNMENT: 2 ==== */ 
+  }
 
    /** returns the actual integration scheme */
    IntegrationSchemeType getIntegScheme() const { return integrationScheme_; }
