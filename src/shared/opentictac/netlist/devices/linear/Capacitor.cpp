@@ -35,7 +35,16 @@ void Capacitor::getAnalysisStamp(
       return;
     }
  /* === HERE STARTS THE CODE OF ASSIGNMENT: 2 ==== */ 
- 
+  nrStampsElements = 4;
+  if (nrStampsElements > (MYINT)stampColumn.size()) stampColumn.resize(nrStampsElements, -1);
+  if (nrStampsElements > (MYINT)stampRow.size()) stampRow.resize(nrStampsElements, -1);
+  if (nrStampsElements > (MYINT)entryType.size()) entryType.resize(nrStampsElements);
+  if (nrStampsElements > (MYINT)potentialEntryValues.size()) potentialEntryValues.resize(nrStampsElements, 0.0);
+
+  stampColumn[0] = 0; stampRow[0] = 0; entryType[0] = DYNAMIC_ONLY; potentialEntryValues[0] = 1.0;
+  stampColumn[1] = 1; stampRow[1] = 0; entryType[1] = DYNAMIC_ONLY; potentialEntryValues[1] = 1.0;
+  stampColumn[2] = 0; stampRow[2] = 1; entryType[2] = DYNAMIC_ONLY; potentialEntryValues[2] = 1.0;
+  stampColumn[3] = 1; stampRow[3] = 1; entryType[3] = DYNAMIC_ONLY; potentialEntryValues[3] = 1.0;
  /* === HERE ENDS THE CODE OF ASSIGNMENT: 2 ==== */ 
 }
 
@@ -54,7 +63,13 @@ void Capacitor::getAnalysisStampRHS(
       return;
     }
  /* === HERE STARTS THE CODE OF ASSIGNMENT: 2 ==== */ 
- 
+  nrRHSStampsElements = 2;
+  if (nrRHSStampsElements > (MYINT)stampColumn.size()) stampColumn.resize(nrRHSStampsElements, -1);
+  if (nrRHSStampsElements > (MYINT)entryType.size()) entryType.resize(nrRHSStampsElements);
+  if (nrRHSStampsElements > (MYINT)potentialEntryValues.size()) potentialEntryValues.resize(nrRHSStampsElements, 0.0);
+
+  stampColumn[0] = 0; entryType[0] = DYNAMIC_ONLY; potentialEntryValues[0] = 1.0;
+  stampColumn[1] = 1; entryType[1] = DYNAMIC_ONLY; potentialEntryValues[1] = 1.0;
  /* === HERE ENDS THE CODE OF ASSIGNMENT: 2 ==== */ 
 }
 
@@ -95,7 +110,15 @@ void Capacitor::evalDevice(
 
 
  /* === HERE STARTS THE CODE OF ASSIGNMENT: 2 ==== */ 
+      MYREAL beta = simulationController->getDDTController()->getBeta(ddtIndex);
 
+      matrixValues[0] =  alpha * capacity_ * mfact;
+      matrixValues[1] = -alpha * capacity_ * mfact;
+      matrixValues[2] = -alpha * capacity_ * mfact;
+      matrixValues[3] =  alpha * capacity_ * mfact;
+
+      rhsValues[0] = -beta * mfact;
+      rhsValues[1] =  beta * mfact;
  /* === HERE ENDS THE CODE OF ASSIGNMENT: 2 ==== */ 
 
       return;
