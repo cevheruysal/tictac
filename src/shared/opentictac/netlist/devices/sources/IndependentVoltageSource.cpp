@@ -153,7 +153,7 @@ void IndependentVoltageSource::tranPostProcess(
         {
 
  /* === HERE STARTS THE CODE OF ASSIGNMENT: 2 ==== */ 
-
+          if (pwlDT1 > 0.0 && pwlDT1 < proposedDT) proposedDT = pwlDT1;
  /* === HERE ENDS THE CODE OF ASSIGNMENT: 2 ==== */ 
       }
   }
@@ -168,7 +168,7 @@ void IndependentVoltageSource::tranPostProcess(
         {
 
  /* === HERE STARTS THE CODE OF ASSIGNMENT: 2 ==== */ 
-
+          proposedDT = this->sinsource_.sintd_ - actualTime;
  /* === HERE ENDS THE CODE OF ASSIGNMENT: 2 ==== */ 
         }
   }
