@@ -1,0 +1,9 @@
+V1 1 0 SIN(0 5 50 0)
+R1 1 2 100
+D1 2 3
+V2 3 0 DC=0
+.TRAN 0.001 0.1
+.option delmin=1e-6
+.option delmax=0.001
+.plot tran V(2) I(V2)
+.end

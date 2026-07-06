@@ -1,0 +1,10 @@
+Vb 1 0 DC=0.7
+Vc 2 0 DC=5.0
+Ve 3 0 DC=0
+Rb 1 b 1k
+Rc 2 c 1k
+Re 3 e 1k
+B1 c b e  
+.op
+.plot dc I(Vb) I(Vc) I(Ve) V(c) V(b) V(e)
+.end

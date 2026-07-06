@@ -1,0 +1,7 @@
+V1 1 0 DC=2
+R1 1 2 100
+D1 2 3
+V2 3 0 DC=0
+.op
+.plot dc I(V2) V(2)
+.end

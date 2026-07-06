@@ -1,0 +1,12 @@
+Vb 1 0 SIN(0.7 0.1 50 0)
+Vc 2 0 DC=10.0
+Ve 3 0 DC=0
+Rb 1 b 1k
+Rc 2 c 1k
+Re 3 e 1k
+B1 c b e  v_t=0.25
+.TRAN 0.001 0.1
+.option delmin=0.001
+.option delmax=0.001
+.plot tran V(c) V(b) I(Vc)
+.end
