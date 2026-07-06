@@ -34,18 +34,18 @@ void Capacitor::getAnalysisStamp(
       nrStampsElements = 0;
       return;
     }
- /* === HERE STARTS THE CODE OF ASSIGNMENT: 2 ==== */ 
+  /*=========== START STUDENT PROJECT A2 ===================== */
   nrStampsElements = 4;
   if (nrStampsElements > (MYINT)stampColumn.size()) stampColumn.resize(nrStampsElements, -1);
   if (nrStampsElements > (MYINT)stampRow.size()) stampRow.resize(nrStampsElements, -1);
   if (nrStampsElements > (MYINT)entryType.size()) entryType.resize(nrStampsElements);
   if (nrStampsElements > (MYINT)potentialEntryValues.size()) potentialEntryValues.resize(nrStampsElements, 0.0);
-
-  stampColumn[0] = 0; stampRow[0] = 0; entryType[0] = DYNAMIC_ONLY; potentialEntryValues[0] = 1.0;
-  stampColumn[1] = 1; stampRow[1] = 0; entryType[1] = DYNAMIC_ONLY; potentialEntryValues[1] = 1.0;
-  stampColumn[2] = 0; stampRow[2] = 1; entryType[2] = DYNAMIC_ONLY; potentialEntryValues[2] = 1.0;
-  stampColumn[3] = 1; stampRow[3] = 1; entryType[3] = DYNAMIC_ONLY; potentialEntryValues[3] = 1.0;
- /* === HERE ENDS THE CODE OF ASSIGNMENT: 2 ==== */ 
+  // TODO: the entry estimation could have been done otherwise ....
+  stampColumn[0] = 0; stampRow[0] = 0; entryType[0] = DYNAMIC_ONLY; potentialEntryValues[0] = 1E+6*this->capacity_;
+  stampColumn[1] = 1; stampRow[1] = 0; entryType[1] = DYNAMIC_ONLY; potentialEntryValues[1] = 1E+6*this->capacity_;
+  stampColumn[2] = 0; stampRow[2] = 1; entryType[2] = DYNAMIC_ONLY; potentialEntryValues[2] = 1E+6*this->capacity_;
+  stampColumn[3] = 1; stampRow[3] = 1; entryType[3] = DYNAMIC_ONLY; potentialEntryValues[3] = 1E+6*this->capacity_;
+  /*=========== END STUDENT PROJECT A2 ===================== */
 }
 
 
@@ -62,15 +62,20 @@ void Capacitor::getAnalysisStampRHS(
       nrRHSStampsElements = 0;
       return;
     }
- /* === HERE STARTS THE CODE OF ASSIGNMENT: 2 ==== */ 
+  /*=========== START STUDENT PROJECT A2 ===================== */
   nrRHSStampsElements = 2;
   if (nrRHSStampsElements > (MYINT)stampColumn.size()) stampColumn.resize(nrRHSStampsElements, -1);
   if (nrRHSStampsElements > (MYINT)entryType.size()) entryType.resize(nrRHSStampsElements);
-  if (nrRHSStampsElements > (MYINT)potentialEntryValues.size()) potentialEntryValues.resize(nrRHSStampsElements, 0.0);
-
-  stampColumn[0] = 0; entryType[0] = DYNAMIC_ONLY; potentialEntryValues[0] = 1.0;
-  stampColumn[1] = 1; entryType[1] = DYNAMIC_ONLY; potentialEntryValues[1] = 1.0;
- /* === HERE ENDS THE CODE OF ASSIGNMENT: 2 ==== */ 
+  if (nrRHSStampsElements > (MYINT)potentialEntryValues.size())
+    potentialEntryValues.resize(nrRHSStampsElements, 0.0);
+  // entry estimation for RHS is not important ...
+  stampColumn[0]          = 0;
+  entryType[0]            = DYNAMIC_ONLY;
+  potentialEntryValues[0] = 1E+6 * this->capacity_;
+  stampColumn[1]          = 1;
+  entryType[1]            = DYNAMIC_ONLY;
+  potentialEntryValues[1] = 1E+6 * this->capacity_;
+  /*=========== END STUDENT PROJECT A2 ===================== */
 }
 
 
@@ -108,18 +113,19 @@ void Capacitor::evalDevice(
       MYREAL alpha = simulationController->getDDTController()->getAlpha(ddtIndex);
       MYREAL ddt   = simulationController->getDDTController()->getDDT(ddtIndex);
 
+      /*=========== START STUDENT PROJECT A2 ===================== */
 
- /* === HERE STARTS THE CODE OF ASSIGNMENT: 2 ==== */ 
-      MYREAL beta = simulationController->getDDTController()->getBeta(ddtIndex);
+      //std::cout << " c stamp=" << (mfact * alpha * capacity_) << " capacity_=" << capacity_ << " alpha=" << alpha << " mfact=" << mfact << "\n";
+      // fill the matrix
+      matrixValues[0] =  mfact * alpha * capacity_;
+      matrixValues[1] = -mfact * alpha * capacity_;
+      matrixValues[2] = -mfact * alpha * capacity_;
+      matrixValues[3] =  mfact * alpha * capacity_;
+      // fill in RHS
+      rhsValues[0] =  mfact * ddt;
+      rhsValues[1] = -mfact * ddt;
 
-      matrixValues[0] =  alpha * capacity_ * mfact;
-      matrixValues[1] = -alpha * capacity_ * mfact;
-      matrixValues[2] = -alpha * capacity_ * mfact;
-      matrixValues[3] =  alpha * capacity_ * mfact;
-
-      rhsValues[0] = -beta * mfact;
-      rhsValues[1] =  beta * mfact;
- /* === HERE ENDS THE CODE OF ASSIGNMENT: 2 ==== */ 
+      /*=========== END STUDENT PROJECT A2 ===================== */
 
       return;
     }

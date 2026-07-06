@@ -151,10 +151,84 @@ void IndependentVoltageSource::tranPostProcess(
       if (   (actPoint1 != actPoint2)
           && (SIMABS(pwlDT1) > SIM_ABS_TIME_STEP_LIMIT) )
         {
+          /*=========== START STUDENT PROJECT A2 ===================== */
 
- /* === HERE STARTS THE CODE OF ASSIGNMENT: 2 ==== */ 
-          if (pwlDT1 > 0.0 && pwlDT1 < proposedDT) proposedDT = pwlDT1;
- /* === HERE ENDS THE CODE OF ASSIGNMENT: 2 ==== */ 
+          // the difference can not be more than one actPoint2 = actPoint1 + 1;
+          if ((actPoint2 != 0) && ((actPoint1+1) != actPoint2) && (actPoint1 < actPoint2)) {
+              actPoint2 = actPoint1 + 1;
+            }
+          // do not jump over the first point at the repeat position
+          if ( (actPoint1 >= (pwlsource_.nrPoints_ - 1)) && (actPoint2 < (pwlsource_.nrPoints_ - 1))){
+              actPoint2 = pwlsource_.repeatIndex_ + 1;
+            }
+
+          // variables and its values are given by Emira's formula
+          MYREAL dsrel = 0.003;
+          MYREAL dsabsv = 2E-5;
+          MYREAL slopeR = 0.0;
+          MYREAL slopeL = 0.0;
+          MYREAL maxVoltage = 1.0;
+          MYREAL ampFact = 0.0;
+          MYREAL PWLDT = 1E-11;
+
+          // define the maximal voltage
+          if (actPoint2 < pwlsource_.nrPoints_)
+            { maxVoltage = SIMMAX( SIMABS(pwlsource_.voltageValues_[actPoint1]) , SIMABS(pwlsource_.voltageValues_[actPoint2]) ); }
+          else
+            { maxVoltage = SIMABS(pwlsource_.voltageValues_[actPoint1]); }
+
+          ampFact = maxVoltage*dsrel + dsabsv;
+          PWLDT = 1E-11;
+          // set the right and left slope
+          if ( (actPoint1 > 0) && (actPoint1 < pwlsource_.nrPoints_)) {
+              MYREAL denominator = SIMMAX( SIMABS(pwlsource_.timeStamps_[actPoint1] - pwlsource_.timeStamps_[actPoint1-1]), 1E-17);
+              slopeL = (pwlsource_.voltageValues_[actPoint1] - pwlsource_.voltageValues_[actPoint1-1])/denominator;
+          }
+          else {   slopeL = 0.0;   }
+          if ( (actPoint2 > 0) && (actPoint2 < pwlsource_.nrPoints_) ) {
+              MYREAL denominator = SIMMAX( SIMABS(pwlsource_.timeStamps_[actPoint2] - pwlsource_.timeStamps_[actPoint2-1]), 1E-17);
+              slopeR = (pwlsource_.voltageValues_[actPoint2] - pwlsource_.voltageValues_[actPoint2-1])/denominator;
+          }
+          else {
+              SIM_PRINT_L3( verb , "actPoint2=" << actPoint2 << " repeatIndex=" << pwlsource_.repeatIndex_);
+              if (actPoint2 >= actPoint1)
+                slopeR = 0.0;
+              else
+                slopeR = (pwlsource_.voltageValues_[pwlsource_.repeatIndex_+1] - pwlsource_.voltageValues_[pwlsource_.repeatIndex_]);
+          }
+
+          // determine the PWL time step size
+          if (actPoint2 > actPoint1) {
+            if (actPoint2 < pwlsource_.nrPoints_)
+              PWLDT = pwlsource_.timeStamps_[actPoint2] - pwlsource_.timeStamps_[actPoint1];
+            else
+              PWLDT = SIM_ABS_LARGE_TIME_LIMIT; // large time which should not reduce the time step
+          }
+          else // this is when the repeat kicks in
+            { PWLDT = (pwlsource_.timeStamps_[actPoint2] - pwlsource_.timeStamps_[pwlsource_.repeatIndex_]); }
+          SIM_PRINT_L5( verb , "tranPostProcess PWLDT=" << PWLDT <<  " rep=" << pwlsource_.repeatTime_);
+
+          // this means breakpoint
+          DeviceInterfaceFlags flag = DEVICE_BREAKPOINT;
+          flags = flags | flag;
+          // -------- here apply the formula from Emira for startDT-------
+          MYREAL myDT = 0;
+          myDT = SIMABS( (slopeR-slopeL) );
+          SIM_PRINT_L5( verb , "tranPostProcess myDT=" << myDT);
+          SIM_PRINT_L5( verb , "tranPostProcess ampFact=" << ampFact);
+          // TODO: do not allow changes greater than 1mV .... !!!! ????
+          myDT = ampFact / ( SIMMAX( myDT, 1E-17 ) );
+          SIM_PRINT_L5( verb , "tranPostProcess myDT=" << myDT);
+          myDT = SIMMIN( myDT, PWLDT );
+          // this will be the next time step after the break point
+          startDT = SIMMIN( startDT , myDT );
+
+          // this is the time step until the breakpoint
+          proposedDT = SIMMIN( pwlDT1, proposedDT );
+          SIM_PRINT_L5( verb , "tranPostProcess slopeR=" << slopeR << " slopeL=" << slopeL << " PWLDT=" << PWLDT << " myDT=" << myDT << " startDT=" << startDT);
+          SIM_PRINT_L3( verb , "tranPostProcess BREAKPOINT proposedDT=" << proposedDT << " flags=" << flags);
+
+          /*=========== END STUDENT PROJECT A2 ===================== */
       }
   }
 
@@ -166,10 +240,19 @@ void IndependentVoltageSource::tranPostProcess(
       // this means we should set a breakpoint and we should limit the proposed time step length
       if ((this->sinsource_.sintd_ > (actualTime+SIM_ABS_TIME_STEP_LIMIT)) && (this->sinsource_.sintd_ < actualTime+proposedDT))
         {
+          /*=========== START STUDENT PROJECT A2 ===================== */
 
- /* === HERE STARTS THE CODE OF ASSIGNMENT: 2 ==== */ 
-          proposedDT = this->sinsource_.sintd_ - actualTime;
- /* === HERE ENDS THE CODE OF ASSIGNMENT: 2 ==== */ 
+          // this will be the next time step after the break point
+          startDT = SIMMIN( startDT , 1.0/(1000.0*this->sinsource_.sinfreq_) );
+          // this is the time step until the breakpoint
+          proposedDT = SIMMIN( proposedDT , this->sinsource_.sintd_ - actualTime);
+          // this means breakpoint
+          DeviceInterfaceFlags flag = DEVICE_BREAKPOINT;
+          flags = flags | flag;
+          //
+          SIM_PRINT_L5( verb , "tranPostProcess  proposedDT="<<proposedDT << " startDT=" << startDT);
+
+          /*=========== END STUDENT PROJECT A2 ===================== */
         }
   }
 }

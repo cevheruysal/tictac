@@ -276,14 +276,20 @@ public:
 
    /** returns the LTE of the x^dot, where x is the argument of the DDT operators
     * x is the charge and x^dot are the dynamic currents*/
-  MYREAL getLTE_DDTX(MYINT ddtIndex) const {
-  /* === HERE STARTS THE CODE OF ASSIGNMENT: 2 ==== */ 
-    if (integrationScheme_ == IE_SCHEME) {
-      return getDeltaT() * SIMABS(getDD2(ddtIndex, 0));
-    }
-    return 0.0;
-  /* === HERE ENDS THE CODE OF ASSIGNMENT: 2 ==== */ 
-  }
+   MYREAL getLTE_DDTX(MYINT ddtIndex) const {
+     /*=========== START STUDENT PROJECT A2 ===================== */
+     if (integrationScheme_ == IE_SCHEME) {
+         MYREAL v = getDD2(ddtIndex,0);
+         //std::cout << " timeDeltas_[swapMap_[0]]=" << timeDeltas_[swapMap_[0]] << " getDD2(ddtIndex,0)=" << v << "\n";
+         return 0.5*timeDeltas_[swapMap_[0]]*v;
+     }
+     if (integrationScheme_ == TR_SCHEME) {
+         return (1.0/6.0)*timeDeltas_[swapMap_[0]]*timeDeltas_[swapMap_[0]]*getDD3(ddtIndex);
+     }
+     SIM_ERROR_STOP("Unknown integration scheme!");
+     return -1;
+     /*=========== END STUDENT PROJECT A2 ===================== */
+   }
 
    /** returns the actual integration scheme */
    IntegrationSchemeType getIntegScheme() const { return integrationScheme_; }

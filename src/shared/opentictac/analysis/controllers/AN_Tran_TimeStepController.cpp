@@ -122,60 +122,76 @@ void AN_Tran_TimeStepController::computeLTEandnewTimeStep(
   MYINT i, nrDDT = dtContrl_->getNrDDTs();
   maxLTEFact = 0.0; // This is maximum LTE_{i}/TOL_{i}
 
+  /*=========== START STUDENT PROJECT A2 ===================== */
 
+  for (i = 0; i < nrDDT; ++i)
+    {
+      MYREAL lte_i = dtContrl_->getLTE_DDTX(i);
+      MYREAL tol_i = timeStepControlRec_->chargeTRTOL_ * (timeStepControlRec_->chargeAbsTol_
+          + timeStepControlRec_->chargeRelTol_ * SIMABS( dtContrl_->getDDT(i) ) );
+      MYREAL tol_i_heur = timeStepControlRec_->chargeHeuristicRelTol_ *
+                     SIMMAX( SIMABS(dtContrl_->getDDTX(i)) , timeStepControlRec_->chargeHeuristicAbsTol_ )
+                     / dtContrl_->getDeltaT();
+      lte_i = SIMABS(lte_i);
+      tol_i = SIMMAX( tol_i, tol_i_heur);
+      maxLTEFact = SIMMAX(maxLTEFact, ( lte_i / tol_i) );
+      SIM_PRINT_L3(verb(), "i=" << i << " lte_i=" << lte_i << " tol_i=" << tol_i << " DDT=" << dtContrl_->getDDT(i) );
+    }
  
- /* === HERE STARTS THE CODE OF ASSIGNMENT: 2 ==== */ 
-  if (nrDDT > 0 && dtContrl_->getIntegScheme() == IE_SCHEME) {
-    MYREAL max_f_LTE = 0.0;
-    
-    for (i = 0; i < nrDDT; ++i) {
-      MYREAL ddt_i = dtContrl_->getDDT(i);
-      MYREAL E_LTE_i = dtContrl_->getLTE_DDTX(i);
-      
-      MYREAL t_i = timeStepControlRec_->chargeTRTOL_ * 
-             (timeStepControlRec_->chargeAbsTol_ + timeStepControlRec_->chargeRelTol_ * SIMABS(ddt_i));
-      
-      MYREAL q_i = dtContrl_->getDDTX(i);
-      MYREAL th_i = timeStepControlRec_->chargeHeuristicRelTol_ * 
-              SIMMAX(SIMABS(q_i), timeStepControlRec_->chargeHeuristicAbsTol_) / oldDT;
-              
-      MYREAL t_new_i = SIMMAX(t_i, th_i);
-      
-      MYREAL f_LTE_i = E_LTE_i / t_new_i;
-      if (f_LTE_i > max_f_LTE) {
-        max_f_LTE = f_LTE_i;
-      }
-    }
-    
-    maxLTEFact = max_f_LTE;
-    
-    if (max_f_LTE > timeStepControlRec_->maxChargeLTEFactor_) {
-			if (oldDT > timeStepControlRec_->minimalDeltaT_ * 1.0001) {
-				rejectStep = true;
-			}
-    }
-    
-    if (max_f_LTE > 1e-15) {
-			deltaT = 0.5 * (1.0 / sqrt(max_f_LTE)) * oldDT;
-    } else {
-			deltaT = oldDT * maxDTIncrease_;
-    }
-    
-    if (deltaT > oldDT * maxDTIncrease_) {
-      deltaT = oldDT * maxDTIncrease_;
-    }
-    
-    if (deltaT < timeStepControlRec_->minimalDeltaT_) {
-      deltaT = timeStepControlRec_->minimalDeltaT_;
-    }
-    if (deltaT > timeStepControlRec_->maximalDeltaT_) {
-      deltaT = timeStepControlRec_->maximalDeltaT_;
-    }
-
-  } else {
-    deltaT = timeStepControlRec_->maximalDeltaT_;
+  // if this is too much then set the flag correctly
+  if (maxLTEFact > timeStepControlRec_->maxChargeLTEFactor_) {
+      // in case of refuse already reset deltaT
+      if (oldDT > 1.1*timeStepControlRec_->minimalDeltaT_ )
+        rejectStep = true;
   }
- /* === HERE ENDS THE CODE OF ASSIGNMENT: 2 ==== */ 
 
+  // compute the length of the new time step
+  if (maxLTEFact < 1E-20)
+    maxLTEFact = 1E-20;
+  deltaT = dampingFactor_ * oldDT * pow( 1.0/maxLTEFact , 1.0/(dtContrl_->getIntegrationOrder() + 1.0));
+  MYREAL pdt = deltaT;
+ 
+  // do not allow a too much increase, this should be limited by a factor
+  if (deltaT > timeStepControlRec_->maximalTimeStepSizeIncrease_*oldDT)
+    deltaT = timeStepControlRec_->maximalTimeStepSizeIncrease_*oldDT;
+  // we limit the time step to min and max dt
+  if (deltaT < timeStepControlRec_->minimalDeltaT_)
+    deltaT = timeStepControlRec_->minimalDeltaT_;
+  if (deltaT > timeStepControlRec_->maximalDeltaT_)
+    deltaT = timeStepControlRec_->maximalDeltaT_;
+
+  SIM_PRINT_L3(verb(), "TimeStepController::computeLTEandnewTimeStep oldDT=" << oldDT
+      << " deltaT=" << deltaT << " maxLTEFact=" << maxLTEFact << " rejectStep=" << rejectStep << " pdt=" << pdt);
+
+  /*=========== END STUDENT PROJECT A2 ===================== */
+
+
+  /*=========== START STUDENT PROJECT AA ===================== */
+/*
+  // here how build the maximum norm between the predicted value and the corrected value
+  SIM_PRINT_L3(verb(), "TimeStepController::computeLTEandnewTimeStep");
+  MYREAL maxNorm_mul_factor = 1E-29;
+  MYREAL previousDT = SIMABS(timeStamps_[swapVector_[0]] -timeStamps_[swapVector_[1]]);
+  MYINT i = 0;
+  for (i = 0; i < nrUnknowns_; i++)
+    {
+      MYREAL tmpDiff      = SIMABS((unkVector[i] - actualExtrapolation_[i]));
+      MYREAL tmpMagnitude = SIMMAX( 1E-29, (SIMABS(unkVector[i]) + SIMABS(actualExtrapolation_[i])) );
+      MYREAL tmpMax       = SIMMAX(tmpDiff, tmpDiff/tmpMagnitude);
+      // TODO: THIS NEEDS TO BE REWORKED !!! to consider relative and absolute changes separately
+      // TODO: in addition charge (DDT) based time step control could also help
+      maxNorm_mul_factor =  SIMMAX( maxNorm_mul_factor , epsilonFactorPerUnknown_[i] * tmpMax );
+      SIM_PRINT_L5(verb(), "i=" << i << " maxNorm_mul_factor= " << maxNorm_mul_factor << " diff=" << tmpMax);
+      SIM_PRINT_L5(verb(), "actualExtrapolation_[i]=" << actualExtrapolation_[i]
+                        << " unkVector[i]= " << unkVector[i] << " e[i]=" << epsilonFactorPerUnknown_[i]);
+    }
+  // here is the simple LTE control
+  deltaT = previousDT * dampingFactor_* (targetEpsilon_/maxNorm_mul_factor);
+  // limit the time step increase by a factor (usually is a factor 2.0)
+  deltaT = SIMMIN( maxDTIncrease_*previousDT, deltaT);
+  // print the proposed time step
+  SIM_PRINT_L2(verb(), "proposeNextTimeStep = " << deltaT << " previousDT=" << previousDT);
+*/
+  /*=========== END STUDENT PROJECT AA ===================== */
 
 }
