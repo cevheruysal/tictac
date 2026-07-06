@@ -7,6 +7,7 @@
 
 #include "NS_NonlinearSolver.hpp"
 #include "NS_Function.hpp"
+#include <cmath>
 
 NS_NonlinearSolver::NS_NonlinearSolver() : UT_SIMVerboseClass("NonlinearSolver")
 {
@@ -138,7 +139,13 @@ bool
 
 
  /* === HERE STARTS THE CODE OF ASSIGNMENT: 3 ==== */ 
-
+  for (size_t i = 0; i < res.size(); ++i) {
+    MYREAL absRes = std::abs(res[i]);
+    if (absRes >= F->getAbsTolVect()[i] && absRes >= F->getRelTolVect()[i] * absContribs[i]) {
+      ret = false;
+      break;
+    }
+  }
  /* === HERE ENDS THE CODE OF ASSIGNMENT: 3 ==== */ 
 
   // return the computed flag
